@@ -34,45 +34,46 @@ public class CombatHandler {
 
             ItemStack heldItem = player.getMainHandItem();
             UUID playerId = player.getUUID();
-            int bonusDmg = RpgStats.getBonusDamage(playerId) * 5; // +5 de daño por cada punto de habilidad
 
+            // +5 de daño por cada punto de habilidad comprado en el menú
+            int bonusDmg = RpgStats.getBonusDamage(playerId) * 5;
             int currentHits = hitCounters.getOrDefault(playerId, 0) + 1;
 
-            // 1. LLAVE INGLESA (URIEL): 25 base (+ daño extra). Al 3er golpe: 55 de daño
+            // 1. LLAVE INGLESA (URIEL): 12 base (+ daño extra). Al 3er golpe: 25 de daño
             if (heldItem.is(ModItems.WRENCH.get())) {
                 if (currentHits >= 3) {
-                    event.setAmount(55.0f + bonusDmg);
-                    player.sendSystemMessage(Component.literal("§6[Uriel] §e⚡ ¡SUPER GOLPE CARGADO! (" + (55 + bonusDmg) + " de Daño)"));
+                    event.setAmount(25.0f + bonusDmg);
+                    player.sendSystemMessage(Component.literal("§6[Uriel] ¡SUPER GOLPE CARGADO! (" + (25 + bonusDmg) + " de Daño)"));
                     hitCounters.put(playerId, 0);
                 } else {
-                    event.setAmount(25.0f + bonusDmg);
+                    event.setAmount(12.0f + bonusDmg);
                     hitCounters.put(playerId, currentHits);
-                    player.sendSystemMessage(Component.literal("§6[Uriel] §7Golpe " + currentHits + "/3 (" + (25 + bonusDmg) + " de Daño)"));
+                    player.sendSystemMessage(Component.literal("§6[Uriel] §7Golpe " + currentHits + "/3 (" + (12 + bonusDmg) + " de Daño)"));
                 }
             }
-            // 2. LÁTIGO (CHATGPT): 30 base (+ daño extra). Al 3er golpe: Velocidad
+            // 2. LÁTIGO (CHATGPT): 14 base (+ daño extra). Al 3er golpe: Velocidad
             else if (heldItem.is(ModItems.WHIP.get())) {
-                event.setAmount(30.0f + bonusDmg);
+                event.setAmount(14.0f + bonusDmg);
                 if (currentHits >= 3) {
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20 * 30, 1));
-                    player.sendSystemMessage(Component.literal("§b[ChatGPT] §a⚡ ¡Velocidad activada por 30s! (" + (30 + bonusDmg) + " de Daño)"));
+                    player.sendSystemMessage(Component.literal("§b[ChatGPT] ¡Velocidad activada por 30s! (" + (14 + bonusDmg) + " de Daño)"));
                     hitCounters.put(playerId, 0);
                 } else {
                     hitCounters.put(playerId, currentHits);
-                    player.sendSystemMessage(Component.literal("§b[ChatGPT] §7Golpe " + currentHits + "/3 (" + (30 + bonusDmg) + " de Daño)"));
+                    player.sendSystemMessage(Component.literal("§b[ChatGPT] §7Golpe " + currentHits + "/3 (" + (14 + bonusDmg) + " de Daño)"));
                 }
             }
-            // 3. HACHA (JOSEPE): 27 base (+ daño extra). Al 3er golpe: Invisibilidad y Fuerza
+            // 3. HACHA (JOSEPE): 15 base (+ daño extra). Al 3er golpe: Invisibilidad y Fuerza
             else if (heldItem.is(ModItems.JOSEPE_AXE.get())) {
-                event.setAmount(27.0f + bonusDmg);
+                event.setAmount(15.0f + bonusDmg);
                 if (currentHits >= 3) {
                     player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 20 * 25, 0));
                     player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 20 * 25, 1)); // Fuerza II
-                    player.sendSystemMessage(Component.literal("§c[Josepe] §d⚡ ¡Fuerza e Invisibilidad por 25s! (" + (27 + bonusDmg) + " de Daño)"));
+                    player.sendSystemMessage(Component.literal("§c[Josepe] ¡Fuerza e Invisibilidad por 25s! (" + (15 + bonusDmg) + " de Daño)"));
                     hitCounters.put(playerId, 0);
                 } else {
                     hitCounters.put(playerId, currentHits);
-                    player.sendSystemMessage(Component.literal("§c[Josepe] §7Golpe " + currentHits + "/3 (" + (27 + bonusDmg) + " de Daño)"));
+                    player.sendSystemMessage(Component.literal("§c[Josepe] §7Golpe " + currentHits + "/3 (" + (15 + bonusDmg) + " de Daño)"));
                 }
             }
         }

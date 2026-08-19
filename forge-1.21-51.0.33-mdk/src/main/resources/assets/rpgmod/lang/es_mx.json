@@ -1,0 +1,17 @@
+{
+  "item.rpgmod.wrench": "Llave Inglesa de Uriel",
+  "item.rpgmod.whip": "Látigo de ChatGPT",
+  "item.rpgmod.josepe_axe": "Hacha de Josepe",
+  "item.rpgmod.boss_fragment": "Fragmento de Base de Datos",
+  "item.rpgmod.boss_key": "Código de Invocación Corrupto",
+  "block.rpgmod.portal_block": "Núcleo de Invocación",
+  "entity.rpgmod.evil_mario": "Evil Mario",
+  "entity.rpgmod.npc_base": "Aldeano Sospechoso",
+  "entity.rpgmod.evil_minion": "Secuaz Corrupto",
+  "item.rpgmod.evil_minion_spawn_egg": "Huevo generador de Secuaz Corrupto",
+  "item.rpgmod.npc_spawn_egg": "Huevo generador de Aldeano Sospechoso",
+  "item.rpgmod.glitch_sword": "Espada Glitch",
+  "item.rpgmod.corrupted_bit": "Bit Corrupto",
+  "item.rpgmod.system_log": "Registro del Sistema",
+  "item.rpgmod.structure_map": "Mapa de la Torre de Base de Datos"
+}

@@ -1,6 +1,7 @@
 package com.heroesdelnorte.rpgmod.registry;
 
 import com.heroesdelnorte.rpgmod.entity.EvilMario;
+import com.heroesdelnorte.rpgmod.entity.EvilMinion;
 import com.heroesdelnorte.rpgmod.entity.NpcBase;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -26,6 +27,11 @@ public class ModEntities {
                     () -> EntityType.Builder.of(NpcBase::new, MobCategory.CREATURE)
                             .sized(0.6f, 1.8f)
                             .build("npc_base"));
+
+    public static final RegistryObject<EntityType<EvilMinion>> EVIL_MINION =
+            ENTITIES.register("evil_minion", () -> EntityType.Builder.of(EvilMinion::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.8f)
+                    .build("evil_minion"));
 
     public static void register(net.minecraftforge.eventbus.api.IEventBus eventBus) {
         // NOTA: Si tu DeferredRegister de entidades se llama diferente a ENTITIES

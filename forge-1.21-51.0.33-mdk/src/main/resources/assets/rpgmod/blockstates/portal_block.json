@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "rpgmod:block/portal_block" },
+    "active=true": { "model": "rpgmod:block/portal_block_active" }
+  }
+}
