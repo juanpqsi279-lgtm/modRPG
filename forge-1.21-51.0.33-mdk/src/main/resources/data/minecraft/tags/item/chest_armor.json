@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "rpgmod:firewall_chestplate",
+    "rpgmod:quantum_chestplate",
+    "rpgmod:admin_chestplate"
+  ]
+}

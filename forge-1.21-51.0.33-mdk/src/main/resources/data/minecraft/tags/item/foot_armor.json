@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "rpgmod:firewall_boots",
+    "rpgmod:quantum_boots",
+    "rpgmod:admin_boots"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "NCN",
+    "BFB",
+    "NCN"
+  ],
+  "key": {
+    "F": { "item": "rpgmod:firewall_chestplate" },
+    "B": { "item": "rpgmod:corrupted_bit" },
+    "N": { "item": "minecraft:netherite_ingot" },
+    "C": { "item": "minecraft:crying_obsidian" }
+  },
+  "result": {
+    "count": 1,
+    "id": "rpgmod:quantum_chestplate"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "rpgmod:firewall_helmet",
+    "rpgmod:quantum_helmet",
+    "rpgmod:admin_helmet"
+  ]
+}

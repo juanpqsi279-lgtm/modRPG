@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 741928351,
+    "separation": 16,
+    "spacing": 36
+  },
+  "structures": [
+    {
+      "structure": "rpgmod:evil_pyramid",
+      "weight": 1
+    }
+  ]
+}

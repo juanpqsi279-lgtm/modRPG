@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="runServer" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="net.minecraftforge.bootstrap.ForgeBootstrap" />
+    <envs>
+      <env name="MCP_MAPPINGS" value="official_1.21" />
+      <env name="MOD_CLASSES" value="$PROJECT_DIR$\forge-1.21-51.0.33-mdk\build\sourcesSets\main" />
+    </envs>
+    <module name="forge-1_21-51_0_33-mdk.main" />
+    <option name="PROGRAM_PARAMETERS" value="--launchTarget forge_userdev_server --gameDir . --nogui" />
+    <option name="VM_PARAMETERS" value="-Dforge.logging.console.level=debug -Dforge.logging.markers=REGISTRIES -Dforge.enabledGameTestNamespaces=rpgmod -Dforge.enableGameTest=true -Djava.net.preferIPv6Addresses=system" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$\forge-1.21-51.0.33-mdk\run" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks=":prepareRunServerCompile" externalProjectPath="$PROJECT_DIR$/forge-1.21-51.0.33-mdk" />
+    </method>
+  </configuration>
+</component>
