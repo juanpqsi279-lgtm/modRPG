@@ -11,7 +11,22 @@
   "item.rpgmod.evil_minion_spawn_egg": "Huevo generador de Secuaz Corrupto",
   "item.rpgmod.npc_spawn_egg": "Huevo generador de Aldeano Sospechoso",
   "item.rpgmod.glitch_sword": "Espada Glitch",
+  "item.rpgmod.drop_table_sword": "Espada DROP TABLE;",
   "item.rpgmod.corrupted_bit": "Bit Corrupto",
   "item.rpgmod.system_log": "Registro del Sistema",
-  "item.rpgmod.structure_map": "Mapa de la Torre de Base de Datos"
+  "item.rpgmod.structure_map": "Mapa de la Torre de Base de Datos",
+  "item.rpgmod.firewall_helmet": "Casco Cortafuegos",
+  "item.rpgmod.firewall_chestplate": "Pechera Cortafuegos",
+  "item.rpgmod.firewall_leggings": "Grebas Cortafuegos",
+  "item.rpgmod.firewall_boots": "Botas Cortafuegos",
+  "item.rpgmod.quantum_helmet": "Casco del Núcleo Cuántico",
+  "item.rpgmod.quantum_chestplate": "Pechera del Núcleo Cuántico",
+  "item.rpgmod.quantum_leggings": "Grebas del Núcleo Cuántico",
+  "item.rpgmod.quantum_boots": "Botas del Núcleo Cuántico",
+  "item.rpgmod.admin_helmet": "Casco ADMIN-SQL MK.I",
+  "item.rpgmod.admin_chestplate": "Reactor ADMIN-SQL MK.I",
+  "item.rpgmod.admin_leggings": "Grebas ADMIN-SQL MK.I",
+  "item.rpgmod.admin_boots": "Propulsores ADMIN-SQL MK.I",
+  "key.rpgmod.open_menu": "Abrir Menú RPG",
+  "key.rpgmod.repulsor_beam": "Disparar Rayo Repulsor SQL"
 }

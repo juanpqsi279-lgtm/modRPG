@@ -1,7 +1,6 @@
 package com.heroesdelnorte.rpgmod.event;
 
 import com.heroesdelnorte.rpgmod.client.renderer.CharacterSkinLayer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -13,11 +12,8 @@ public class PlayerSkinHandler {
 
     @SubscribeEvent
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
-        // Obtenemos los renderizadores (Slim/Wide) directamente del motor de Minecraft
-        var skinMap = Minecraft.getInstance().getEntityRenderDispatcher().getSkinMap();
-
-        // Iteramos sobre ellos y les añadimos nuestra capa RPG
-        for (var renderer : skinMap.values()) {
+        for (var skin : event.getSkins()) {
+            var renderer = event.getPlayerSkin(skin);
             if (renderer instanceof PlayerRenderer playerRenderer) {
                 playerRenderer.addLayer(new CharacterSkinLayer(playerRenderer));
             }

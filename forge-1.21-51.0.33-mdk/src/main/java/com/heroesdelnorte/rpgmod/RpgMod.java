@@ -1,8 +1,5 @@
 package com.heroesdelnorte.rpgmod;
 
-import com.heroesdelnorte.rpgmod.client.renderer.EvilMarioRenderer;
-import com.heroesdelnorte.rpgmod.client.renderer.EvilMinionRenderer;
-import com.heroesdelnorte.rpgmod.client.renderer.NpcRenderer;
 import com.heroesdelnorte.rpgmod.entity.EvilMario;
 import com.heroesdelnorte.rpgmod.entity.EvilMinion;
 import com.heroesdelnorte.rpgmod.entity.NpcBase;
@@ -11,7 +8,6 @@ import com.heroesdelnorte.rpgmod.registry.ModBlocks;
 import com.heroesdelnorte.rpgmod.registry.ModEntities;
 import com.heroesdelnorte.rpgmod.registry.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -25,29 +21,52 @@ public class RpgMod {
     public RpgMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // 1. Catálogos de Registro
+        // 1. Catálogos de Registro (ModBlocks antes de ModItems para registrar el BlockItem del portal)
         ModEntities.ENTITIES.register(modEventBus);
-        ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
 
-        // ¡ESTA ES LA LÍNEA QUE REVIVE EL MENÚ DE LA LETRA 'R'!
+        // 2. Red cliente-servidor
         ModMessages.register();
 
-        // 2. Eventos del ciclo de vida del mod
+        // 3. Eventos del ciclo de vida del mod
         modEventBus.addListener(this::registerAttributes);
-        modEventBus.addListener(this::registerEntityRenderers);
-
-        // 3. Conexión del inventario creativo
         modEventBus.addListener(this::addCreative);
 
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    // Método para inyectar los huevos en el inventario creativo (Pestaña Huevos)
+    // Método para inyectar los ítems del mod en las pestañas del inventario creativo
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.EVIL_MINION_SPAWN_EGG);
             event.accept(ModItems.NPC_SPAWN_EGG);
+        } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            event.accept(ModItems.WRENCH);
+            event.accept(ModItems.WHIP);
+            event.accept(ModItems.JOSEPE_AXE);
+            event.accept(ModItems.GLITCH_SWORD);
+            event.accept(ModItems.DROP_TABLE_SWORD);
+            event.accept(ModItems.FIREWALL_HELMET);
+            event.accept(ModItems.FIREWALL_CHESTPLATE);
+            event.accept(ModItems.FIREWALL_LEGGINGS);
+            event.accept(ModItems.FIREWALL_BOOTS);
+            event.accept(ModItems.QUANTUM_HELMET);
+            event.accept(ModItems.QUANTUM_CHESTPLATE);
+            event.accept(ModItems.QUANTUM_LEGGINGS);
+            event.accept(ModItems.QUANTUM_BOOTS);
+            event.accept(ModItems.ADMIN_HELMET);
+            event.accept(ModItems.ADMIN_CHESTPLATE);
+            event.accept(ModItems.ADMIN_LEGGINGS);
+            event.accept(ModItems.ADMIN_BOOTS);
+        } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            event.accept(ModBlocks.PORTAL_BLOCK_ITEM);
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ModItems.BOSS_FRAGMENT);
+            event.accept(ModItems.BOSS_KEY);
+            event.accept(ModItems.CORRUPTED_BIT);
+            event.accept(ModItems.SYSTEM_LOG);
+            event.accept(ModItems.STRUCTURE_MAP);
         }
     }
 
@@ -56,12 +75,5 @@ public class RpgMod {
         event.put(ModEntities.EVIL_MARIO.get(), EvilMario.createAttributes().build());
         event.put(ModEntities.NPC_BASE.get(), NpcBase.createAttributes().build());
         event.put(ModEntities.EVIL_MINION.get(), EvilMinion.createAttributes().build());
-    }
-
-    // Registro visual de modelos y texturas
-    private void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.EVIL_MARIO.get(), EvilMarioRenderer::new);
-        event.registerEntityRenderer(ModEntities.NPC_BASE.get(), NpcRenderer::new);
-        event.registerEntityRenderer(ModEntities.EVIL_MINION.get(), EvilMinionRenderer::new);
     }
 }

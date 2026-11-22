@@ -1,11 +1,14 @@
 package com.heroesdelnorte.rpgmod.event;
 
+import com.heroesdelnorte.rpgmod.RpgStats;
 import com.heroesdelnorte.rpgmod.registry.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -13,11 +16,15 @@ import net.minecraft.world.item.ItemStack;
 public class CharacterInventoryManager {
 
     public static void switchCharacterInventory(Player player, String oldClass, String newClass) {
+        if (!RpgStats.isValidClass(newClass)) {
+            return;
+        }
+
         CompoundTag persistentData = player.getPersistentData();
         HolderLookup.Provider provider = player.level().registryAccess();
 
-        // 1. Guardar Inventario Actual
-        if (oldClass != null && !oldClass.isEmpty()) {
+        // 1. Guardar inventario y estadísticas del personaje saliente
+        if (oldClass != null && !oldClass.isEmpty() && RpgStats.isValidClass(oldClass)) {
             ListTag savedItems = new ListTag();
             for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
                 ItemStack stack = player.getInventory().getItem(i);
@@ -30,17 +37,21 @@ public class CharacterInventoryManager {
             persistentData.put("Inventory_" + oldClass, savedItems);
             persistentData.putFloat("Health_" + oldClass, player.getHealth());
             persistentData.putInt("Food_" + oldClass, player.getFoodData().getFoodLevel());
+            persistentData.putFloat("Saturation_" + oldClass, player.getFoodData().getSaturationLevel());
             persistentData.putInt("XpLevel_" + oldClass, player.experienceLevel);
             persistentData.putFloat("XpProgress_" + oldClass, player.experienceProgress);
         }
 
-        // GUARDAR CLASE ACTIVA PARA RECORDARLA AL MORIR
-        persistentData.putString("ActiveRPGClass", newClass);
+        // 2. Actualizar clase activa y aplicar atributos ANTES de restaurar la vida
+        RpgStats.setActiveClass(player, newClass);
+        if (player instanceof ServerPlayer serverPlayer) {
+            RpgStats.applyAllPlayerAttributes(serverPlayer);
+        }
 
-        // 2. Limpiar inventario
+        // 3. Limpiar inventario actual
         player.getInventory().clearContent();
 
-        // 3. Cargar Datos del Nuevo Personaje
+        // 4. Cargar datos del nuevo personaje
         String key = "Inventory_" + newClass;
         if (persistentData.contains(key, Tag.TAG_LIST)) {
             ListTag savedItems = persistentData.getList(key, Tag.TAG_COMPOUND);
@@ -53,24 +64,37 @@ public class CharacterInventoryManager {
                 }
             }
             if (persistentData.contains("Health_" + newClass)) {
-                player.setHealth(persistentData.getFloat("Health_" + newClass));
+                float savedHealth = persistentData.getFloat("Health_" + newClass);
+                player.setHealth(Math.max(1.0F, Math.min(savedHealth, player.getMaxHealth())));
                 player.getFoodData().setFoodLevel(persistentData.getInt("Food_" + newClass));
+                if (persistentData.contains("Saturation_" + newClass)) {
+                    player.getFoodData().setSaturation(persistentData.getFloat("Saturation_" + newClass));
+                }
                 player.experienceLevel = persistentData.getInt("XpLevel_" + newClass);
                 player.experienceProgress = persistentData.getFloat("XpProgress_" + newClass);
+            } else {
+                player.setHealth(player.getMaxHealth());
             }
         } else {
-            // Stats para primera vez
+            // Stats iniciales para primera vez con esta clase
             player.setHealth(player.getMaxHealth());
             player.getFoodData().setFoodLevel(20);
+            player.getFoodData().setSaturation(5.0F);
             player.experienceLevel = 0;
             player.experienceProgress = 0.0f;
         }
 
-        // 4. EL BLINDAJE: Asegurarse de que el jugador TENGA su arma
+        // 5. Asegurar que el jugador tenga su arma de clase
         ensureWeapon(player, newClass);
 
         player.sendSystemMessage(Component.literal("§a[RPG] Personaje activo: §l" + newClass));
-        player.giveExperienceLevels(0);
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.connection.send(new ClientboundSetExperiencePacket(
+                    serverPlayer.experienceProgress,
+                    serverPlayer.totalExperience,
+                    serverPlayer.experienceLevel
+            ));
+        }
         player.containerMenu.broadcastChanges();
         player.inventoryMenu.broadcastChanges();
     }
@@ -93,7 +117,14 @@ public class CharacterInventoryManager {
                 }
             }
             if (!hasWeapon) {
-                player.getInventory().add(new ItemStack(requiredWeapon));
+                ItemStack weaponStack = new ItemStack(requiredWeapon);
+                if (!player.getInventory().add(weaponStack)) {
+                    ItemStack displaced = player.getInventory().getItem(0).copy();
+                    player.getInventory().setItem(0, weaponStack);
+                    if (!displaced.isEmpty()) {
+                        player.drop(displaced, false);
+                    }
+                }
             }
         }
     }

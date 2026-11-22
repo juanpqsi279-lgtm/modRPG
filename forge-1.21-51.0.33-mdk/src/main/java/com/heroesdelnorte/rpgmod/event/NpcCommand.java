@@ -22,7 +22,7 @@ public class NpcCommand {
                                     int npcId = IntegerArgumentType.getInteger(context, "npcid");
 
                                     Entity entity = player.serverLevel().getEntity(npcId);
-                                    if (entity instanceof NpcBase npc) {
+                                    if (entity instanceof NpcBase npc && player.distanceToSqr(npc) <= 64.0D) {
                                         npc.handleMenuAction(player, action);
                                     }
                                     return 1;

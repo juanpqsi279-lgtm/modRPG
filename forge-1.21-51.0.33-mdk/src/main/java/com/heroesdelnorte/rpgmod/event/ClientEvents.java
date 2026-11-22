@@ -1,16 +1,20 @@
 package com.heroesdelnorte.rpgmod.event;
 
 import com.heroesdelnorte.rpgmod.client.gui.RpgMenuScreen;
-import com.heroesdelnorte.rpgmod.registry.ModItems;
+import com.heroesdelnorte.rpgmod.item.RpgArmorItem;
+import com.heroesdelnorte.rpgmod.item.RpgWeapon;
+import com.heroesdelnorte.rpgmod.network.FireRepulsorPayload;
+import com.heroesdelnorte.rpgmod.network.ModMessages;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
@@ -25,38 +29,64 @@ public class ClientEvents {
             "key.categories.gameplay"
     );
 
-    private static boolean checkedInitialLogin = false;
+    public static final KeyMapping FIRE_REPULSOR = new KeyMapping(
+            "key.rpgmod.repulsor_beam",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_V,
+            "key.categories.gameplay"
+    );
 
-    // Al entrar al mundo, si no tiene clase guardada, le abre la pantalla a la fuerza
+    private static boolean pendingInitialSelection = false;
+
+    public static void requestInitialSelection() {
+        pendingInitialSelection = true;
+    }
+
+    public static void clearInitialSelection() {
+        pendingInitialSelection = false;
+    }
+
+    // Al entrar al mundo sin clase en el servidor, abre la pantalla obligatoria
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null && mc.level != null) {
-                if (!checkedInitialLogin) {
-                    Player player = mc.player;
-                    String currentClass = player.getPersistentData().getString("RpgModClass");
-
-                    if (currentClass.isEmpty()) {
-                        // Abre pantalla obligatoria (no cerrable con ESC)
-                        mc.setScreen(new RpgMenuScreen(player, true));
-                    }
-                    checkedInitialLogin = true;
+                if (pendingInitialSelection && mc.screen == null) {
+                    pendingInitialSelection = false;
+                    mc.setScreen(new RpgMenuScreen(mc.player, true));
                 }
             } else {
-                checkedInitialLogin = false; // Se resetea al salir del mundo
+                pendingInitialSelection = false;
             }
         }
     }
 
-    // Abrir menú con la tecla R durante el juego
+    // Abrir menú (R) o disparar Rayo Repulsor SQL (V) durante el juego
     @SubscribeEvent
     public static void onKeyInput(InputEvent.Key event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.screen != null) {
+            return;
+        }
         if (OPEN_RPG_MENU.consumeClick()) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null) {
-                mc.setScreen(new RpgMenuScreen(mc.player, false));
-            }
+            mc.setScreen(new RpgMenuScreen(mc.player, false));
+        }
+        if (FIRE_REPULSOR.consumeClick() && RpgArmorItem.hasFullAdminSqlSet(mc.player)) {
+            ModMessages.sendToServer(new FireRepulsorPayload());
+        }
+    }
+
+    // Disparo alternativo del Rayo Repulsor: Shift + Clic Derecho con mano vacía
+    @SubscribeEvent
+    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen == null
+                && event.getHand() == InteractionHand.MAIN_HAND
+                && event.getEntity() == mc.player
+                && event.getEntity().isShiftKeyDown()
+                && RpgArmorItem.hasFullAdminSqlSet(event.getEntity())) {
+            ModMessages.sendToServer(new FireRepulsorPayload());
         }
     }
 
@@ -65,6 +95,7 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onKeyRegister(RegisterKeyMappingsEvent event) {
             event.register(OPEN_RPG_MENU);
+            event.register(FIRE_REPULSOR);
         }
     }
 
@@ -72,13 +103,9 @@ public class ClientEvents {
     @SubscribeEvent
     public static void onDropKeyPress(InputEvent.Key event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null && mc.options.keyDrop.isDown()) {
+        if (mc.player != null && mc.screen == null && mc.options.keyDrop.isDown()) {
             ItemStack heldItem = mc.player.getMainHandItem();
-            if (heldItem.is(ModItems.WRENCH.get()) ||
-                    heldItem.is(ModItems.WHIP.get()) ||
-                    heldItem.is(ModItems.JOSEPE_AXE.get())) {
-
-                // Consumir el click para que el cliente no haga la animación de tirar
+            if (heldItem.getItem() instanceof RpgWeapon) {
                 while (mc.options.keyDrop.consumeClick()) {}
             }
         }

@@ -41,37 +41,45 @@ public class PortalBlock extends Block {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 
-        // Si el bloque NO está activo y el jugador le da clic con el USB (BOSS_KEY)
-        if (!state.getValue(ACTIVE) && stack.is(ModItems.BOSS_KEY.get())) {
-            if (!level.isClientSide()) {
-                // Quitar la llave de la mano
-                stack.shrink(1);
+        if (!state.getValue(ACTIVE)) {
+            if (stack.is(ModItems.BOSS_KEY.get())) {
+                if (!level.isClientSide()) {
+                    if (!player.isCreative()) {
+                        stack.shrink(1);
+                    }
 
-                // ¡Cambiar el estado del bloque a ACTIVO (esto cambia la textura visual)!
-                level.setBlock(pos, state.setValue(ACTIVE, true), 3);
+                    level.setBlock(pos, state.setValue(ACTIVE, true), 3);
 
-                // Mensaje inicial
-                level.getServer().getPlayerList().broadcastSystemMessage(
-                        Component.literal("§c[!] La base de datos se ha corrompido... Algo se acerca."), false);
+                    if (level.getServer() != null) {
+                        level.getServer().getPlayerList().broadcastSystemMessage(
+                                Component.literal("§c[!] ¡El Código Corrupto fue insertado en la cima de la Torre de Base de Datos! Algo se acerca..."), false);
+                    }
 
-                // Rayo visual inicial
-                LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(level);
-                if (lightning != null) {
-                    lightning.moveTo(Vec3.atBottomCenterOf(pos.above()));
-                    lightning.setVisualOnly(true);
-                    level.addFreshEntity(lightning);
+                    LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(level);
+                    if (lightning != null) {
+                        lightning.moveTo(Vec3.atBottomCenterOf(pos.above()));
+                        lightning.setVisualOnly(true);
+                        level.addFreshEntity(lightning);
+                    }
+
+                    level.scheduleTick(pos, this, 100);
                 }
-
-                // Iniciar cuenta regresiva de 5 segundos
-                level.scheduleTick(pos, this, 100);
+                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            } else if (!level.isClientSide() && hand == InteractionHand.MAIN_HAND) {
+                player.sendSystemMessage(Component.literal(
+                        "§b[Núcleo de Invocación] §fRequiere el §6Código de Invocación Corrupto§f. "
+                                + "Habla con los §bPrisioneros enjaulados §f(Pisos 2 y 4) y dales §e4 Fragmentos + 1 Bloque de Redstone §fpara que lo compilen."));
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE)) {
+            return;
+        }
+
         // Invocar a Evil Mario
         EvilMario boss = ModEntities.EVIL_MARIO.get().create(level);
         if (boss != null) {
@@ -87,8 +95,10 @@ public class PortalBlock extends Block {
             }
 
             // Anuncio
-            level.getServer().getPlayerList().broadcastSystemMessage(
-                    Component.literal("§4[!!!] ¡EvilMario ha llegado... Prepárate para morir!"), false);
+            if (level.getServer() != null) {
+                level.getServer().getPlayerList().broadcastSystemMessage(
+                        Component.literal("§4[!!!] ¡EvilMario ha llegado... Prepárate para morir!"), false);
+            }
 
             // Destruir el portal
             level.destroyBlock(pos, false);

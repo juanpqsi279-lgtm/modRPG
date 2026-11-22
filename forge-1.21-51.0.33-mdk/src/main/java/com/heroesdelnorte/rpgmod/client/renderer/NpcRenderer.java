@@ -15,8 +15,7 @@ public class NpcRenderer extends HumanoidMobRenderer<NpcBase, HumanoidModel<NpcB
 
     @Override
     public ResourceLocation getTextureLocation(NpcBase entity) {
-        int skinId = entity.getSkinId();
-        // Agregamos "npc/" a la ruta para que coincida con tu explorador de archivos
+        int skinId = Math.floorMod(entity.getSkinId(), NpcBase.SKIN_COUNT);
         return ResourceLocation.fromNamespaceAndPath("rpgmod", "textures/entity/npc/npc_" + skinId + ".png");
     }
 }
